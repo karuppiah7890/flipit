@@ -55,11 +55,11 @@ android {
         }
     }
 
-    splits {
-        abi {
-            enable true
-        }
-    }
+//    splits {
+//        abi {
+//            enable true
+//        }
+//    }
 }
 
 flutter {
