@@ -1,3 +1,4 @@
+//noinspection GradleDynamicVersion
 def localProperties = new Properties()
 def localPropertiesFile = rootProject.file('local.properties')
 if (localPropertiesFile.exists()) {
@@ -53,6 +54,12 @@ android {
             signingConfig signingConfigs.debug
         }
     }
+
+    splits {
+        abi {
+            enable true
+        }
+    }
 }
 
 flutter {
@@ -62,6 +69,8 @@ flutter {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test:runner:1.1.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
+    androidTestImplementation 'androidx.test:runner:1.2.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    // Spectrum with support for JPEG, PNG and WebP
+    implementation 'com.facebook.spectrum:spectrum-default:1.1.0'
 }
