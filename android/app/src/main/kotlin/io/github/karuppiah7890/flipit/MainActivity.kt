@@ -17,51 +17,57 @@ import java.io.IOException
 
 
 class MainActivity : FlutterActivity() {
-  private val _channel = "flutter.native/helper"
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-    GeneratedPluginRegistrant.registerWith(this)
-    SpectrumSoLoader.init(this)
+    private val _channel = "flutter.native/helper"
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        GeneratedPluginRegistrant.registerWith(this)
+        SpectrumSoLoader.init(this)
 
-    val mSpectrum = Spectrum.make(SpectrumLogcatLogger(Log.INFO),
-            DefaultPlugins.get()) // JPEG, PNG and WebP plugins
+        val mSpectrum = Spectrum.make(SpectrumLogcatLogger(Log.INFO),
+                DefaultPlugins.get()) // JPEG, PNG and WebP plugins
 
 
-    MethodChannel(flutterView, _channel).setMethodCallHandler { call, result ->
-      if (call.method == "flipHorizontally") {
-        val inputFile = call.argument<String>("inputFile")
-        val desiredOutputFile = call.argument<String>("outputFile")
-        try {
-          if (inputFile != null && desiredOutputFile != null) {
-            flipHorizontally(inputFile, desiredOutputFile, mSpectrum)
-            result.success(null)
-          }
-        } catch (e: Exception) {
-          result.error("exception: $e", null, null)
+        MethodChannel(flutterView, _channel).setMethodCallHandler { call, result ->
+            if (call.method == "flip") {
+                val inputFile = call.argument<String>("inputFile")
+                val desiredOutputFile = call.argument<String>("outputFile")
+                val flipHorizontally = call.argument<Boolean>("flipHorizontally")
+                val flipVertically = call.argument<Boolean>("flipVertically")
+                try {
+                    if (inputFile != null && desiredOutputFile != null &&
+                            flipHorizontally != null && flipVertically != null) {
+                        flip(mSpectrum, desiredOutputFile, inputFile, flipHorizontally, flipVertically)
+                        result.success("successfully flipped it!")
+                    } else {
+                        result.error("check your flip function parameters: \ninputFile: $inputFile\n" +
+                                "outputFile: $desiredOutputFile\n" +
+                                "flipHorizontally: $flipHorizontally\n" +
+                                "flipVertically: $flipVertically", null, null)
+                    }
+                } catch (e: Exception) {
+                    result.error("exception: $e", null, null)
+                }
+            }
         }
-
-        result.error("input file path or output file path was null", null, null)
-      }
     }
-  }
 
-  private fun flipHorizontally(inputFile: String, outputFile: String, mSpectrum: Spectrum) {
-    try {
-      contentResolver.openInputStream(Uri.fromFile(File(inputFile))).use { inputStream ->
-        val transcodeOptions = TranscodeOptions.Builder(EncodeRequirement(JPEG, 100))
-                .rotate(RotateRequirement(0, true, false, true))
-                .build()
+    private fun flip(mSpectrum: Spectrum, outputFile: String, inputFile: String, flipHorizontally: Boolean, flipVertically: Boolean) {
+        try {
+            contentResolver.openInputStream(Uri.fromFile(File(inputFile))).use { inputStream ->
+                val transcodeOptions = TranscodeOptions.Builder(EncodeRequirement(JPEG, 100))
+                        .rotate(RotateRequirement(0, flipHorizontally, flipVertically, true))
+                        .build()
 
-        mSpectrum.transcode(
-                EncodedImageSource.from(inputStream),
-                EncodedImageSink.from(outputFile),
-                transcodeOptions,
-                "upload_flow_callsite_identifier")
-      }
-    } catch (e: IOException) {
-      throw e
-    } catch (e: SpectrumException) {
-      throw e
+                mSpectrum.transcode(
+                        EncodedImageSource.from(inputStream),
+                        EncodedImageSink.from(outputFile),
+                        transcodeOptions,
+                        "upload_flow_callsite_identifier")
+            }
+        } catch (e: IOException) {
+            throw e
+        } catch (e: SpectrumException) {
+            throw e
+        }
     }
-  }
 }

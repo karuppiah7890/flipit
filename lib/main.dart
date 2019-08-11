@@ -53,23 +53,25 @@ class _MyHomePageState extends State<MyHomePage> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
               IconButton(
-                icon: Icon(Icons.flip),
+                icon: Icon(Icons.swap_horiz),
                 onPressed: () {
-                  flip("flipHorizontally");
+                  flip(true, false);
                 },
                 tooltip: "flip horizontal",
               ),
               IconButton(
-                icon: Icon(Icons.flip),
+                icon: Icon(Icons.swap_vert),
                 tooltip: "flip vertical",
-                onPressed: () {},
+                onPressed: () {
+                  flip(false, true);
+                },
               ),
             ],
           ),
         ));
   }
 
-  Future<void> flip(String flipDirection) async {
+  Future<void> flip(bool flipHorizontally, bool flipVertically) async {
     if (_image.path == "") {
       return;
     }
@@ -79,9 +81,11 @@ class _MyHomePageState extends State<MyHomePage> {
     String response = "";
     try {
       final String result =
-      await platform.invokeMethod(flipDirection, <String, dynamic>{
+      await platform.invokeMethod('flip', <String, dynamic>{
         'inputFile': _image.path,
         'outputFile': outputImagePath,
+        'flipHorizontally': flipHorizontally,
+        'flipVertically': flipVertically,
       });
       response = result;
       setState(() {
