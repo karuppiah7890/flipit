@@ -69,14 +69,14 @@ class _MyHomePageState extends State<MyHomePage> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
               IconButton(
-                icon: Icon(Icons.swap_horiz),
+                icon: Icon(Icons.swap_horiz, size: 35),
                 onPressed: () {
                   flip(true, false);
                 },
                 tooltip: "flip horizontal",
               ),
               IconButton(
-                icon: Icon(Icons.swap_vert),
+                icon: Icon(Icons.swap_vert, size: 35),
                 tooltip: "flip vertical",
                 onPressed: () {
                   flip(false, true);
