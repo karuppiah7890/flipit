@@ -1,11 +1,12 @@
+import 'dart:developer' as developer;
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
-import 'dart:developer' as developer;
 
 void main() => runApp(MyApp());
 
@@ -42,10 +43,25 @@ class _MyHomePageState extends State<MyHomePage> {
           title: Text(widget.title),
         ),
         body: _bodyContent(),
-        floatingActionButton: FloatingActionButton(
-          onPressed: getImage,
-          tooltip: 'Add Image',
+        floatingActionButton: SpeedDial(
           child: Icon(Icons.add),
+          animatedIconTheme: IconThemeData(size: 22.0),
+          visible: true,
+          curve: Curves.bounceIn,
+          children: [
+            SpeedDialChild(
+              child: Icon(Icons.photo),
+              onTap: () => getImage(ImageSource.gallery),
+              label: 'Gallery',
+              labelStyle: TextStyle(fontWeight: FontWeight.w700),
+            ),
+            SpeedDialChild(
+              child: Icon(Icons.camera_alt),
+              onTap: () => getImage(ImageSource.camera),
+              label: 'Camera',
+              labelStyle: TextStyle(fontWeight: FontWeight.w700),
+            ),
+          ],
         ),
         bottomNavigationBar: BottomAppBar(
           child: new Row(
@@ -81,7 +97,7 @@ class _MyHomePageState extends State<MyHomePage> {
     String response = "";
     try {
       final String result =
-      await platform.invokeMethod('flip', <String, dynamic>{
+          await platform.invokeMethod('flip', <String, dynamic>{
         'inputFile': _image.path,
         'outputFile': outputImagePath,
         'flipHorizontally': flipHorizontally,
@@ -98,8 +114,8 @@ class _MyHomePageState extends State<MyHomePage> {
     developer.log(response, name: 'flipResponse');
   }
 
-  Future getImage() async {
-    var image = await ImagePicker.pickImage(source: ImageSource.gallery);
+  Future getImage(ImageSource imageSource) async {
+    var image = await ImagePicker.pickImage(source: imageSource);
 
     setState(() {
       _image = image;
